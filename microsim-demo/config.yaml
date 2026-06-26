@@ -1,0 +1,106 @@
+# Simulation-level configuration
+simulation:
+  iterations: 10
+  population_file: "population.csv"
+  output_file: "output.csv"
+  random_seed: 42
+  verbose: true
+
+# Statistics definitions - fully configurable, no hardcoded columns!
+statistics:
+  # Population counts
+  - name: "population_total"
+    description: "Total population"
+    query: "SELECT COUNT(*) as total FROM population"
+  
+  # Alive/dead counts (only works if 'alive' column exists)
+  - name: "population_status"
+    description: "Alive and dead counts"
+    query: |
+      SELECT 
+        COUNT(CASE WHEN alive = true THEN 1 END) as alive,
+        COUNT(CASE WHEN alive = false THEN 1 END) as dead
+      FROM population
+  
+  # Age distribution (only works if 'age' column exists)
+  - name: "age_distribution"
+    description: "Age groups (alive only)"
+    query: |
+      SELECT 
+        COUNT(CASE WHEN age < 18 THEN 1 END) as children_0_17,
+        COUNT(CASE WHEN age >= 18 AND age < 65 THEN 1 END) as adults_18_64,
+        COUNT(CASE WHEN age >= 65 AND age < 85 THEN 1 END) as elderly_65_84,
+        COUNT(CASE WHEN age >= 85 THEN 1 END) as super_elderly_85_plus
+      FROM population
+      WHERE alive = true
+  
+  # Age distribution for entire population (all ages)
+  - name: "age_distribution_all"
+    description: "Age groups (entire population)"
+    query: |
+      SELECT 
+        COUNT(CASE WHEN age < 18 THEN 1 END) as children_0_17,
+        COUNT(CASE WHEN age >= 18 AND age < 65 THEN 1 END) as adults_18_64,
+        COUNT(CASE WHEN age >= 65 THEN 1 END) as elderly_65_plus
+      FROM population
+  
+  # Average age by alive status
+  - name: "avg_age_by_status"
+    description: "Average age by alive status"
+    query: |
+      SELECT 
+        AVG(CASE WHEN alive = true THEN age END) as avg_age_alive,
+        AVG(CASE WHEN alive = false THEN age END) as avg_age_dead,
+        AVG(age) as avg_age_all
+      FROM population
+  
+  # Sex distribution (only works if 'sex' column exists)
+  - name: "sex_distribution"
+    description: "Sex distribution"
+    query: |
+      SELECT 
+        COUNT(CASE WHEN sex = 'F' AND alive = true THEN 1 END) as females_alive,
+        COUNT(CASE WHEN sex = 'M' AND alive = true THEN 1 END) as males_alive,
+        COUNT(CASE WHEN sex = 'F' THEN 1 END) as females_total,
+        COUNT(CASE WHEN sex = 'M' THEN 1 END) as males_total
+      FROM population
+
+# Model definitions
+models:
+  # Model 1: Age increment (highest priority - runs first)
+  - name: "age_increment"
+    type: "sql_update"
+    priority: 1
+    enabled: true
+    description: "Increment everyone's age by 1 year"
+    parameters:
+      query: |
+        UPDATE population 
+        SET age = age + 1 
+        WHERE alive = true
+
+  # Model 2: Mortality (second priority)
+  - name: "mortality"
+    type: "sql_update"
+    priority: 2
+    enabled: true
+    description: "Age-specific mortality model"
+    parameters:
+      mortality_rates:
+        infant: 0.005
+        child: 0.0005
+        adult: 0.001
+        elderly: 0.10
+        super_elderly: 0.20
+      query: |
+        UPDATE population 
+        SET alive = false 
+        WHERE 
+          alive = true AND (
+            (age < 1 AND random() < {mortality_rates.infant}) OR
+            (age >= 1 AND age < 5 AND random() < {mortality_rates.child}) OR
+            (age >= 18 AND age < 65 AND random() < {mortality_rates.adult}) OR
+            (age >= 65 AND age < 85 AND random() < {mortality_rates.elderly}) OR
+            (age >= 85 AND random() < {mortality_rates.super_elderly})
+          )
+
