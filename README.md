@@ -1,6 +1,8 @@
-Here's the updated README with that line removed:
+<div align="left">
+  <img src="img/Talos.jpeg" alt="Talos Logo" width="300" height="300">
+  <p><em>Talos — Migration Microsimulation Engine</em></p>
+</div>    
 
----
 
 # Talos
 ## Migration Microsimulation Engine
