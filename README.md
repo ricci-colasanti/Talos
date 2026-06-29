@@ -1,6 +1,4 @@
-Here's the complete README.md with the tutorials section added right after Overview:
 
-```markdown
 <div align="left">
   <img src="img/Talos.jpeg" alt="Talos Logo" width="300" height="300">
   <p><em>Talos — Migration Microsimulation Engine</em></p>
