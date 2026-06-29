@@ -583,18 +583,7 @@ MIT License - See LICENSE file for details.
 
 Nik Lomax  
 Alison Heppenstall  
+Hugh Rice 
 Andreas Hoehn  
-Hugh Rice  
 Ric Colasanti  
 
-## Acknowledgments
-
-This system builds upon the excellent work of:
-- **SQLite**: The world's most used database engine
-- **modernc.org/sqlite**: Pure Go port of SQLite
-- **Go**: The programming language that makes it all possible
-- **Migration Research Community**: For insights into population movement patterns
-
----
-
-**Talos: Bringing migration models to life through simple, self-contained, SQL-powered simulation.** 🏛️
