@@ -35,7 +35,215 @@ This gives us 10 individuals with various ages. The columns are:
 - `area`: Geographic area (we'll use just one area for now)
 - `alive`: Whether the person is alive (true/false)
 
-## Step 2: Create the Configuration File
+## Step 2: Understanding YAML Configuration Files
+
+Before we create our configuration file, let's understand the YAML format. YAML (YAML Ain't Markup Language) is a human-readable data format that Talos uses for configuration.
+
+### Important YAML Rules
+
+**1. Indentation Matters (Spaces Only, No Tabs!)**
+
+YAML uses indentation to show structure. Always use spaces, never tabs. The number of spaces doesn't matter as long as it's consistent, but 2 spaces is the standard convention.
+
+```yaml
+# ✅ CORRECT - using spaces
+simulation:
+  iterations: 5
+  population_file: "population.csv"
+
+# ❌ WRONG - using tabs (invisible but will cause errors)
+simulation:
+	iterations: 5
+	population_file: "population.csv"
+
+# ❌ WRONG - inconsistent indentation
+simulation:
+    iterations: 5
+  population_file: "population.csv"
+```
+
+**2. Case Sensitivity**
+
+YAML is case-sensitive. `simulation` is not the same as `Simulation`.
+
+```yaml
+# ✅ CORRECT
+simulation:
+  iterations: 5
+
+# ❌ WRONG - uppercase S
+Simulation:
+  iterations: 5
+```
+
+**3. Column Names Must Match Your CSV**
+
+This is the most important rule for Talos! The column names you use in your SQL queries must exactly match the column names in your CSV file.
+
+```csv
+# CSV column names
+person_id,age,sex,area,alive
+```
+
+```sql
+-- ✅ CORRECT - matches CSV
+UPDATE population 
+SET age = age + 1 
+WHERE alive = true
+
+-- ❌ WRONG - 'Age' doesn't match 'age' in CSV
+UPDATE population 
+SET Age = Age + 1 
+WHERE Alive = true
+```
+
+**4. Key-Value Pairs**
+
+YAML uses `key: value` format with a colon and a space:
+
+```yaml
+# ✅ CORRECT
+name: "age_increment"
+priority: 1
+
+# ❌ WRONG - missing space after colon
+name:"age_increment"
+priority:1
+```
+
+**5. Multi-line Strings with the Pipe (`|`)**
+
+For SQL queries and long text, use the pipe (`|`) character for multi-line strings:
+
+```yaml
+# ✅ CORRECT - preserves line breaks
+query: |
+  UPDATE population 
+  SET age = age + 1 
+  WHERE alive = true
+
+# ❌ WRONG - single line is hard to read
+query: "UPDATE population SET age = age + 1 WHERE alive = true"
+```
+
+**Why do we need the pipe (`|`)?**
+
+The pipe tells YAML that the following text is a **multi-line string**. Without it, YAML would treat each line as a separate value or would combine everything into a single line.
+
+**Let's see what happens without the pipe:**
+
+```yaml
+# ❌ WRONG - YAML will fail to parse this
+query: UPDATE population 
+SET age = age + 1 
+WHERE alive = true
+```
+
+YAML would see this as three separate lines and throw an error because it expects a single value after the colon.
+
+**With the pipe (`|`):**
+
+```yaml
+# ✅ CORRECT - YAML preserves the multi-line format
+query: |
+  UPDATE population 
+  SET age = age + 1 
+  WHERE alive = true
+```
+
+The pipe tells YAML: "Everything that follows, indented, is a single string value." This allows us to write clean, readable SQL queries that span multiple lines.
+
+**What about other multi-line options?**
+
+| Option | What it does | When to use |
+|--------|--------------|-------------|
+| `|` (pipe) | Preserves line breaks | For SQL queries where formatting matters |
+| `>` (greater than) | Folds lines into one | For long text descriptions |
+| `|-` (pipe with dash) | Same as `|` but strips trailing newline | For cleaner output |
+
+**Indentation matters with the pipe:**
+
+The content after the pipe must be indented (usually 2 or 4 spaces):
+
+```yaml
+# ✅ CORRECT - content is indented
+query: |
+  UPDATE population 
+  SET age = age + 1 
+  WHERE alive = true
+
+# ❌ WRONG - content is not indented
+query: |
+UPDATE population 
+SET age = age + 1 
+WHERE alive = true
+```
+
+**Quick Summary:**
+
+| Without `|` | With `|` |
+|-------------|----------|
+| Single line only | Multiple lines allowed |
+| `query: "UPDATE population SET age = age + 1 WHERE alive = true"` | `query: |`<br>`  UPDATE population`<br>`  SET age = age + 1`<br>`  WHERE alive = true` |
+| Hard to read for complex queries | Easy to read and maintain |
+
+**Remember:**
+- Always use the pipe (`|`) for SQL queries that span multiple lines
+- Content after the pipe must be indented
+- This is a YAML rule, not a Talos rule!
+
+**6. Lists (Arrays)**
+
+Use a dash (`-`) for list items:
+
+```yaml
+# ✅ CORRECT
+models:
+  - name: "age_increment"
+    priority: 1
+  - name: "mortality"
+    priority: 2
+
+# ❌ WRONG - missing dash
+models:
+  name: "age_increment"
+  priority: 1
+  name: "mortality"
+  priority: 2
+```
+
+**7. Common YAML Mistakes**
+
+| Mistake | Example | Fix |
+|---------|---------|-----|
+| Missing colon | `name "age_increment"` | `name: "age_increment"` |
+| Missing space after colon | `name:"age_increment"` | `name: "age_increment"` |
+| Using tabs | `\titerations: 5` | Use spaces instead |
+| Inconsistent indentation | `iterations:\n 5` | Use consistent spaces |
+| Case mismatch | `Simulation:` | `simulation:` |
+| Column name mismatch | `Age` in query, `age` in CSV | Match exactly |
+| Missing pipe for multi-line | `query: UPDATE...` | `query: |` then new line |
+
+### Basic YAML Structure for Talos
+
+Here's the basic structure of a Talos configuration file:
+
+```yaml
+simulation:                   # Level 1
+  iterations: 5              # Level 2
+  population_file: "file"    # Level 2
+
+models:                       # Level 1
+  - name: "model1"           # Level 2 (list item)
+    type: "sql_update"       # Level 3
+    priority: 1              # Level 3
+    parameters:              # Level 3
+      query: |               # Level 4 (pipe for multi-line)
+        UPDATE population    # Level 4 continues
+        SET age = age + 1    # Level 4 continues
+```
+
+## Step 3: Create the Configuration File
 
 Now let's create a configuration file called `config_aging.yaml`. This file tells Talos what models to run and how to run them.
 
@@ -95,12 +303,49 @@ Let's break down what this configuration does:
 - The `query` is an SQL UPDATE statement that adds 1 to everyone's age
 - `WHERE alive = true` ensures only alive people age
 
+**Important: The column names in the SQL query must match your CSV exactly!**
+
+In our CSV we have:
+- `age` (lowercase)
+- `alive` (lowercase)
+
+So our SQL uses:
+- `age` (lowercase)
+- `alive` (lowercase)
+
+If your CSV had `Age` and `Alive` (capitalized), you'd need to use those exact names.
+
 **Statistics Section:**
 - We define two statistics to track
 - `population_total` - Counts everyone
 - `age_distribution` - Groups population into children, adults, and elderly
 
-## Step 3: Run the Simulation
+### Common YAML Errors to Avoid
+
+1. **Mismatched column names:**
+   ```yaml
+   # If your CSV has 'age' but you write:
+   UPDATE population SET Age = Age + 1  # ❌ WRONG
+   UPDATE population SET age = age + 1  # ✅ CORRECT
+   ```
+
+2. **Incorrect indentation:**
+   ```yaml
+   models:
+   - name: "age_increment"
+   type: "sql_update"  # ❌ WRONG - should be indented
+   ```
+
+3. **Missing or extra spaces:**
+   ```yaml
+   name:"age_increment"  # ❌ WRONG - missing space
+   name: "age_increment" # ✅ CORRECT
+   ```
+
+4. **Mixing tabs and spaces:**
+   - Always use spaces. Most text editors can show invisible characters.
+
+## Step 4: Run the Simulation
 
 Now run Talos with your configuration:
 
@@ -151,7 +396,7 @@ You should see output similar to this:
 2024/01/15 10:00:00 Results saved to population_aged.csv
 ```
 
-## Step 4: Examine the Output
+## Step 5: Examine the Output
 
 ### Console Output Analysis
 
@@ -199,7 +444,7 @@ Notice that everyone has aged exactly 5 years:
 - Person 9: 55 → 60
 - Person 10: 70 → 75
 
-## Step 5: Adding More Statistics (Understanding SQL)
+## Step 6: Adding More Statistics (Understanding SQL)
 
 Now let's add more statistics to better understand our population. **This is where we'll learn the basics of SQL**, which is the language Talos uses for models and statistics.
 
@@ -317,6 +562,36 @@ Examples:
 - `CASE WHEN age < 18 THEN 'child' ELSE 'adult' END` - Returns 'child' if age < 18, otherwise 'adult'
 - `CASE WHEN sex = 'F' THEN 1 ELSE 0 END` - Returns 1 for females, 0 for males
 
+### Understanding Female Children Example
+
+If you want to count **female children** specifically, you add `AND sex = 'F'`:
+
+```sql
+COUNT(CASE WHEN age < 18 AND sex = 'F' THEN 1 END) as female_children
+```
+
+Similarly for other groups:
+
+```sql
+SELECT 
+  -- Female children
+  COUNT(CASE WHEN age < 18 AND sex = 'F' THEN 1 END) as female_children,
+  -- Male children
+  COUNT(CASE WHEN age < 18 AND sex = 'M' THEN 1 END) as male_children,
+  -- Female adults
+  COUNT(CASE WHEN age >= 18 AND age < 65 AND sex = 'F' THEN 1 END) as female_adults,
+  -- Male adults
+  COUNT(CASE WHEN age >= 18 AND age < 65 AND sex = 'M' THEN 1 END) as male_adults,
+  -- Female elderly
+  COUNT(CASE WHEN age >= 65 AND sex = 'F' THEN 1 END) as female_elderly,
+  -- Male elderly
+  COUNT(CASE WHEN age >= 65 AND sex = 'M' THEN 1 END) as male_elderly
+FROM population
+WHERE alive = true
+```
+
+**Key point:** Column names are **case-sensitive** and must match your CSV. If your CSV has `sex` (lowercase), use `sex`. If it has `Sex` (uppercase S), use `Sex`.
+
 ### Adding Age Group Detail
 
 Want more detailed age groups?
@@ -339,7 +614,7 @@ WHERE alive = true
 
 The `BETWEEN` operator is inclusive - `age BETWEEN 0 AND 4` means age 0, 1, 2, 3, or 4.
 
-## Step 6: Your Task - Creating Age Range Statistics
+## Step 7: Your Task - Creating Age Range Statistics
 
 Now it's your turn! Let's add two new statistics to track the age range of our population.
 
@@ -456,7 +731,7 @@ You should see something like this in the statistics output:
 - Verify all column names exist in your population (age, sex, alive)
 - If `STDDEV()` doesn't work, try `STDEV()` (some SQL versions use different names)
 
-## Step 7: Full Configuration with All Statistics
+## Step 8: Full Configuration with All Statistics
 
 Here's the complete configuration with all our statistics including your new ones:
 
@@ -532,7 +807,7 @@ statistics:
       WHERE alive = true
 ```
 
-## Step 8: Run with the Complete Configuration
+## Step 9: Run with the Complete Configuration
 
 Save the complete configuration as `config_aging_complete.yaml` and run it:
 
@@ -595,13 +870,17 @@ Save the complete configuration as `config_aging_complete.yaml` and run it:
 
 You've successfully:
 1. Created a population CSV file
-2. Written a configuration that ages the population
-3. Added comprehensive statistics including age range and spread
-4. Run a Talos simulation with all statistics
-5. Analyzed the output
+2. Learned about YAML format and its rules (including the pipe `|` for multi-line strings)
+3. Written a configuration that ages the population
+4. Added comprehensive statistics including age range and spread
+5. Run a Talos simulation with all statistics
+6. Analyzed the output
 
 ### Key Takeaways
 
+- **YAML is whitespace-sensitive**: Indentation matters and always use spaces, never tabs
+- **The pipe (`|`) is for multi-line strings**: Essential for writing readable SQL queries
+- **Column names must match exactly**: What you put in your CSV must match what you write in SQL queries
 - **Talos models are SQL**: The aging model is just an SQL UPDATE statement
 - **SQL is powerful**: You can ask many questions about your data
 - **Statistics are customizable**: Add any SQL query as a statistic
@@ -641,6 +920,7 @@ In the next tutorial, we'll add mortality to the aging model, creating a more re
 **Error: "Failed to execute model query"**
 - Check your SQL syntax in the query
 - Verify column names exist in the population
+- Make sure column names match your CSV exactly (case-sensitive!)
 - Make sure `alive` column exists
 
 **Error: "no such function: STDDEV"**
@@ -651,3 +931,10 @@ In the next tutorial, we'll add mortality to the aging model, creating a more re
 - Test your SQL query separately if possible
 - Check for typos in column names
 - Verify the syntax is valid for SQLite
+
+**YAML parsing errors**
+- Check your indentation (use spaces, not tabs)
+- Make sure there's a space after each colon
+- Verify all quotes are balanced
+- Use a YAML validator online to check your syntax
+- **Remember the pipe (`|`) for multi-line SQL queries!**
