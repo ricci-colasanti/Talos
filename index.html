@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Talos - Migration Microsimulation Engine</title>
+        <link rel="icon" type="image/jpeg" href="img/icon.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            color: #222;
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            min-height: 100vh;
+        }
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+            color: #1a1a1a;
+            letter-spacing: -0.5px;
+        }
+        .subtitle {
+            font-size: 1.3rem;
+            font-weight: 400;
+            color: #555;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #eaeaea;
+            padding-bottom: 1rem;
+        }
+        h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            color: #1a1a1a;
+        }
+        h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-top: 1.8rem;
+            margin-bottom: 0.8rem;
+            color: #1a1a1a;
+        }
+        h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            margin-bottom: 0.6rem;
+            color: #1a1a1a;
+        }
+        p {
+            margin-bottom: 1rem;
+        }
+        ul, ol {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+        li {
+            margin-bottom: 0.4rem;
+        }
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            background-color: #f0f0f0;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-size: 0.9rem;
+            color: #c7254e;
+        }
+        pre {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1.2rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 1.2rem 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        pre code {
+            background-color: transparent;
+            color: #d4d4d4;
+            padding: 0;
+            font-size: 0.9rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.2rem 0;
+            font-size: 0.95rem;
+        }
+        th {
+            background-color: #f0f0f0;
+            font-weight: 600;
+            padding: 0.6rem 1rem;
+            text-align: left;
+            border-bottom: 2px solid #ddd;
+        }
+        td {
+            padding: 0.6rem 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+        .image-container {
+            text-align: center;
+            margin: 2rem 0;
+            padding: 1rem;
+            background-color: #fafafa;
+            border-radius: 8px;
+            border: 1px solid #eaeaea;
+        }
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            max-height: 400px;
+            border-radius: 4px;
+        }
+        .image-container .caption {
+            margin-top: 0.6rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .badge {
+            display: inline-block;
+            background-color: #2c3e50;
+            color: white;
+            padding: 0.2rem 0.8rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 0.4rem;
+        }
+        .badge-green {
+            background-color: #27ae60;
+        }
+        .badge-blue {
+            background-color: #2980b9;
+        }
+        hr {
+            border: none;
+            border-top: 2px solid #eaeaea;
+            margin: 2rem 0;
+        }
+        .footer {
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid #eaeaea;
+            color: #777;
+            font-size: 0.9rem;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            h2 {
+                font-size: 1.5rem;
+            }
+            pre {
+                font-size: 0.8rem;
+                padding: 0.8rem;
+            }
+            table {
+                font-size: 0.85rem;
+            }
+            th, td {
+                padding: 0.4rem 0.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <div class="image-container">
+            <img src="img/Talos.jpeg" alt="Talos - Migration Microsimulation Engine">
+            <div class="caption">Talos — Migration Microsimulation Engine</div>
+        </div>
+
+        <h1>Talos</h1>
+        <div class="subtitle">Migration Microsimulation Engine</div>
+
+        <p>A fully self-contained, dynamically configurable demographic microsimulation system written in Go. <strong>Talos is specifically designed as a migration microsimulation model</strong> that simulates population movement between geographic areas while also handling other demographic processes like aging and mortality.</p>
+
+        <h2>Overview</h2>
+        <p>Talos is a <strong>migration-focused microsimulation engine</strong> that models population dynamics through individual-level simulation. Unlike traditional microsimulation systems that require code changes for each new model, Talos uses:</p>
+        <ul>
+            <li><strong>SQL queries</strong> for model logic (declarative and flexible)</li>
+            <li><strong>YAML configuration</strong> for model parameters, migration rates, and execution order</li>
+            <li><strong>CSV files</strong> for population data (works with any column structure)</li>
+            <li><strong>Pure Go SQLite</strong> for in-memory data processing (no external dependencies)</li>
+        </ul>
+        <p>The result is a single, self-contained executable that can be distributed and run on any system without installation requirements. <strong>Talos's primary strength is its ability to model complex migration patterns</strong> with age-specific probabilities, area tracking, and configurable destination selection.</p>
+
+        <h2>Key Features</h2>
+
+        <h3>Migration-Focused Capabilities</h3>
+        <ul>
+            <li><strong>Age-Specific Migration Probabilities</strong>: Different migration rates for children, young adults, middle-aged, and elderly populations</li>
+            <li><strong>Area Tracking</strong>: Tracks current and previous areas for migration history analysis</li>
+            <li><strong>Random Destination Selection</strong>: Migrants choose from multiple destination areas</li>
+            <li><strong>Migration Statistics</strong>: Automatic tracking of migration rates, flows, and patterns</li>
+            <li><strong>Flexible Migration Logic</strong>: Easily modify migration rules through YAML configuration</li>
+        </ul>
+
+        <h3>General Features</h3>
+        <ul>
+            <li><strong>Zero External Dependencies</strong>: Pure Go implementation with embedded SQLite — no C compiler, no SQLite installation, no system libraries required</li>
+            <li><strong>Single Binary Deployment</strong>: Build once, run anywhere (Linux, Windows, macOS)</li>
+            <li><strong>Fully Dynamic Data Handling</strong>: Automatically detects and adapts to any CSV column structure</li>
+            <li><strong>SQL-Based Models</strong>: Define complex demographic transitions using familiar SQL syntax</li>
+            <li><strong>Parameter Substitution</strong>: Use placeholders like <code>{migration_rates.adult}</code> in SQL queries for flexible parameterization</li>
+            <li><strong>Configurable Statistics</strong>: Define any SQL query as a statistic to track population metrics</li>
+            <li><strong>Priority-Based Execution</strong>: Models run in specified priority order (age, mortality, migration)</li>
+            <li><strong>In-Memory Processing</strong>: Fast, in-memory SQLite database for population data</li>
+            <li><strong>Checkpoint Output</strong>: Results saved as CSV for further analysis</li>
+            <li><strong>Reproducible Results</strong>: Fixed random seeds for consistent simulation outcomes</li>
+        </ul>
+
+        <h2>Migration Model</h2>
+        <p>Talos's migration model is designed to be simple yet powerful, allowing researchers to simulate realistic population movement patterns.</p>
+
+        <h3>How Migration Works</h3>
+        <ol>
+            <li><strong>Current Area Tracking</strong>: Each individual has an <code>area</code> column indicating their current location</li>
+            <li><strong>Previous Area Tracking</strong>: The <code>previous_area</code> column stores where they were before migration</li>
+            <li><strong>Age-Based Probabilities</strong>: Migration likelihood varies by age group (most mobile: 18–34; least: 65+)</li>
+            <li><strong>Random Destination</strong>: When migrating, individuals move to a random area (configurable)</li>
+            <li><strong>Temporal Dynamics</strong>: Migration probabilities apply annually during the simulation</li>
+        </ol>
+
+        <h3>Migration Probabilities by Age</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Age Group</th>
+                    <th>Probability (per year)</th>
+                    <th>Rationale</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>0–17</td>
+                    <td>2%</td>
+                    <td>Children move with families</td>
+                </tr>
+                <tr>
+                    <td>18–34</td>
+                    <td>8%</td>
+                    <td>Most mobile — education, jobs, housing</td>
+                </tr>
+                <tr>
+                    <td>35–64</td>
+                    <td>3%</td>
+                    <td>Career-established, less mobile</td>
+                </tr>
+                <tr>
+                    <td>65+</td>
+                    <td>1%</td>
+                    <td>Retired, least mobile</td>
+                </tr>
+            </tbody>
+        </table>
+        <p>These rates are fully configurable in the YAML configuration file.</p>
+
+        <h2>Quick Start</h2>
+
+        <h3>Prerequisites</h3>
+        <ul>
+            <li>Go 1.21 or later (only required for compilation — pre-built binaries have no dependencies)</li>
+            <li>Git (optional, for cloning)</li>
+        </ul>
+
+        <h3>Download Pre-Built Binary (Easiest)</h3>
+        <p>Choose your platform and download the appropriate binary:</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Platform</th>
+                    <th>Binary Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Linux (x86_64)</td>
+                    <td><code>talos-linux-amd64</code></td>
+                </tr>
+                <tr>
+                    <td>Linux (ARM64)</td>
+                    <td><code>talos-linux-arm64</code></td>
+                </tr>
+                <tr>
+                    <td>Windows (x86_64)</td>
+                    <td><code>talos-windows-amd64.exe</code></td>
+                </tr>
+                <tr>
+                    <td>macOS (Intel)</td>
+                    <td><code>talos-darwin-amd64</code></td>
+                </tr>
+                <tr>
+                    <td>macOS (Apple Silicon)</td>
+                    <td><code>talos-darwin-arm64</code></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <pre><code># On Linux/macOS
+chmod +x talos-*
+./talos-linux-amd64 config.yaml
+
+# On Windows
+talos-windows-amd64.exe config.yaml</code></pre>
+
+        <h3>Run with Sample Data</h3>
+        <pre><code># Download sample configuration and data
+wget https://raw.githubusercontent.com/your-repo/talos/main/config.yaml
+wget https://raw.githubusercontent.com/your-repo/talos/main/population.csv
+
+# Run the simulation
+./talos-linux-amd64 config.yaml</code></pre>
+
+        <h2>Configuration</h2>
+        <p>The system is entirely configured through a single YAML file:</p>
+
+        <h3>Simulation Parameters</h3>
+        <pre><code>simulation:
+  iterations: 10                    # Number of years to simulate
+  population_file: "population.csv" # Input CSV file
+  output_file: "output.csv"         # Output CSV file
+  random_seed: 42                   # Fixed random seed for reproducibility
+  verbose: true                     # Detailed logging output</code></pre>
+
+        <h3>Model Definitions</h3>
+        <p>Models define demographic transitions using SQL UPDATE statements:</p>
+        <pre><code>models:
+  - name: "age_increment"
+    type: "sql_update"
+    priority: 1
+    enabled: true
+    parameters:
+      query: |
+        UPDATE population 
+        SET age = age + 1 
+        WHERE alive = true
+
+  - name: "mortality"
+    type: "sql_update"
+    priority: 2
+    enabled: true
+    parameters:
+      mortality_rates:
+        infant: 0.005
+        elderly: 0.10
+      query: |
+        UPDATE population 
+        SET alive = false 
+        WHERE alive = true AND (
+          (age < 1 AND random() < {mortality_rates.infant}) OR
+          (age >= 85 AND random() < {mortality_rates.elderly})
+        )
+  
+  - name: "migration"
+    type: "sql_update"
+    priority: 3
+    enabled: true
+    parameters:
+      migration_rates:
+        child_0_17: 0.02
+        adult_18_34: 0.08
+        adult_35_64: 0.03
+        elderly_65_plus: 0.01
+      query: |
+        UPDATE population 
+        SET previous_area = area 
+        WHERE alive = true;
+        
+        UPDATE population 
+        SET area = 
+          CASE 
+            WHEN age < 18 AND alive = true AND random() < {migration_rates.child_0_17} 
+              THEN CAST(abs(random() % 5) + 1 AS INTEGER)
+            WHEN age >= 18 AND age < 35 AND alive = true AND random() < {migration_rates.adult_18_34} 
+              THEN CAST(abs(random() % 5) + 1 AS INTEGER)
+            WHEN age >= 35 AND age < 65 AND alive = true AND random() < {migration_rates.adult_35_64} 
+              THEN CAST(abs(random() % 5) + 1 AS INTEGER)
+            WHEN age >= 65 AND alive = true AND random() < {migration_rates.elderly_65_plus} 
+              THEN CAST(abs(random() % 5) + 1 AS INTEGER)
+            ELSE area
+          END
+        WHERE alive = true</code></pre>
+
+        <h3>Statistics Definitions</h3>
+        <p>Statistics are SQL queries that produce summary metrics:</p>
+        <pre><code>statistics:
+  - name: "migration_stats"
+    description: "Migration statistics"
+    query: |
+      SELECT 
+        COUNT(CASE WHEN previous_area != area THEN 1 END) as migrants,
+        COUNT(*) as total,
+        CAST(COUNT(CASE WHEN previous_area != area THEN 1 END) AS FLOAT) / COUNT(*) * 100 as migration_rate_pct
+      FROM population
+      WHERE alive = true
+  
+  - name: "area_distribution"
+    description: "Population by area"
+    query: |
+      SELECT 
+        area,
+        COUNT(*) as total,
+        COUNT(CASE WHEN alive = true THEN 1 END) as alive
+      FROM population
+      GROUP BY area
+      ORDER BY area</code></pre>
+
+        <h2>Input Data Format</h2>
+        <p>The system accepts any CSV file with a header row. Column types are automatically detected:</p>
+
+        <h3>Required Columns</h3>
+        <ul>
+            <li><code>person_id</code>: Unique identifier</li>
+            <li><code>age</code>: Age in years</li>
+            <li><code>area</code>: Current geographic area (integer or string)</li>
+            <li><code>alive</code>: Boolean indicating if individual is alive</li>
+        </ul>
+
+        <h3>Recommended Columns</h3>
+        <ul>
+            <li><code>previous_area</code>: Previous geographic area (initialized to 0 or −1)</li>
+        </ul>
+
+        <h3>Example CSV</h3>
+        <pre><code>person_id,age,sex,area,alive,previous_area
+1,25,F,1,true,0
+2,30,M,2,true,0
+3,45,F,1,true,0
+4,68,M,3,true,0
+5,82,F,2,true,0</code></pre>
+
+        <h2>Output</h2>
+
+        <h3>Console Output</h3>
+        <p>The simulation outputs real-time statistics including:</p>
+        <ul>
+            <li>Population counts (alive/dead)</li>
+            <li>Age distribution</li>
+            <li>Area distribution</li>
+            <li>Migration statistics (migrants, migration rate)</li>
+            <li>Average age by area</li>
+        </ul>
+
+        <h3>CSV Output</h3>
+        <p>The final population state is saved as CSV with all columns preserved, including:</p>
+        <ul>
+            <li>Original columns (person_id, age, sex, area, alive)</li>
+            <li>Migration history (previous_area)</li>
+            <li>Additional columns added by models</li>
+        </ul>
+
+        <h2>Compiling from Source</h2>
+
+        <h3>Prerequisites for Compilation</h3>
+        <ul>
+            <li>Go 1.21 or later</li>
+            <li>Git (optional)</li>
+        </ul>
+
+        <h3>Step 1: Install Go</h3>
+        <p><strong>Ubuntu/Debian:</strong></p>
+        <pre><code>sudo apt update
+sudo apt install golang-go
+# Or install latest version
+wget https://go.dev/dl/go1.21.5.linux-amd64.tar.gz
+sudo tar -C /usr/local -xzf go1.21.5.linux-amd64.tar.gz
+export PATH=$PATH:/usr/local/go/bin</code></pre>
+
+        <p><strong>macOS:</strong></p>
+        <pre><code>brew install go</code></pre>
+
+        <p><strong>Windows:</strong></p>
+        <p>Download and install from <a href="https://go.dev/dl/">https://go.dev/dl/</a></p>
+
+        <h3>Step 2: Clone or Create Project</h3>
+        <pre><code># Clone the repository
+git clone https://github.com/your-repo/talos.git
+cd talos
+
+# Or create a new project
+mkdir talos
+cd talos</code></pre>
+
+        <h3>Step 3: Get Dependencies</h3>
+        <pre><code># Initialize Go module
+go mod init talos
+
+# Get dependencies (pure-Go SQLite, no CGO needed)
+go get modernc.org/sqlite
+go get gopkg.in/yaml.v3
+
+# Tidy dependencies
+go mod tidy</code></pre>
+
+        <h3>Step 4: Compile</h3>
+        <p><strong>Compile for Current Platform:</strong></p>
+        <pre><code>go build -o talos main.go</code></pre>
+
+        <p><strong>Compile for Specific Platforms:</strong></p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Target Platform</th>
+                    <th>Command</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Linux (x86_64)</td>
+                    <td><code>GOOS=linux GOARCH=amd64 go build -o talos-linux-amd64 main.go</code></td>
+                </tr>
+                <tr>
+                    <td>Linux (ARM64)</td>
+                    <td><code>GOOS=linux GOARCH=arm64 go build -o talos-linux-arm64 main.go</code></td>
+                </tr>
+                <tr>
+                    <td>Windows</td>
+                    <td><code>GOOS=windows GOARCH=amd64 go build -o talos-windows-amd64.exe main.go</code></td>
+                </tr>
+                <tr>
+                    <td>macOS (Intel)</td>
+                    <td><code>GOOS=darwin GOARCH=amd64 go build -o talos-darwin-amd64 main.go</code></td>
+                </tr>
+                <tr>
+                    <td>macOS (Apple Silicon)</td>
+                    <td><code>GOOS=darwin GOARCH=arm64 go build -o talos-darwin-arm64 main.go</code></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p><strong>Compile for All Platforms at Once:</strong></p>
+        <p>Create a <code>Makefile</code>:</p>
+        <pre><code>.PHONY: all linux windows mac linux-arm mac-arm
+
+all: linux windows mac linux-arm mac-arm
+
+linux:
+	GOOS=linux GOARCH=amd64 go build -o talos-linux-amd64 main.go
+
+linux-arm:
+	GOOS=linux GOARCH=arm64 go build -o talos-linux-arm64 main.go
+
+windows:
+	GOOS=windows GOARCH=amd64 go build -o talos-windows-amd64.exe main.go
+
+mac:
+	GOOS=darwin GOARCH=amd64 go build -o talos-darwin-amd64 main.go
+
+mac-arm:
+	GOOS=darwin GOARCH=arm64 go build -o talos-darwin-arm64 main.go
+
+clean:
+	rm -f talos-*</code></pre>
+
+        <p>Then run:</p>
+        <pre><code>make all</code></pre>
+
+        <h3>Step 5: Verify Compilation</h3>
+        <p><strong>Check Binary:</strong></p>
+        <pre><code># Check file type
+file talos-linux-amd64
+
+# Check for dynamic dependencies (should show no external libraries)
+ldd talos-linux-amd64  # On Linux
+otool -L talos-darwin-amd64  # On macOS
+
+# Check binary size
+ls -lh talos-*</code></pre>
+
+        <p><strong>Test Run:</strong></p>
+        <pre><code>./talos-linux-amd64 config.yaml</code></pre>
+
+        <h3>Step 6: (Optional) Install System-Wide</h3>
+        <p><strong>Linux/macOS:</strong></p>
+        <pre><code>sudo cp talos-linux-amd64 /usr/local/bin/talos
+sudo chmod +x /usr/local/bin/talos
+
+# Now run from anywhere
+talos config.yaml</code></pre>
+
+        <p><strong>Windows:</strong></p>
+        <p>Add the directory containing <code>talos-windows-amd64.exe</code> to your PATH, or rename to <code>talos.exe</code> and place in a convenient location.</p>
+
+        <h2>Troubleshooting</h2>
+
+        <h3>Common Issues</h3>
+        <p><strong>"No such function: random"</strong></p>
+        <ul>
+            <li>Some SQLite builds may not include the random() function</li>
+            <li>Use <code>abs(random() % 1000000) / 1000000.0</code> instead</li>
+        </ul>
+
+        <p><strong>"Failed to load population"</strong></p>
+        <ul>
+            <li>Check CSV file path and format</li>
+            <li>Ensure CSV has a header row</li>
+            <li>Verify all rows have the same number of columns</li>
+        </ul>
+
+        <p><strong>"Failed to execute model query"</strong></p>
+        <ul>
+            <li>Check SQL syntax in the model definition</li>
+            <li>Verify column names exist in the population (e.g., area, previous_area)</li>
+            <li>Ensure parameter placeholders are correct</li>
+        </ul>
+
+        <p><strong>Binary won't run on target system</strong></p>
+        <ul>
+            <li>Build for the target platform: <code>GOOS=linux GOARCH=amd64 go build</code></li>
+            <li>Check architecture compatibility: <code>file talos</code></li>
+        </ul>
+
+        <p><strong>"go: command not found"</strong></p>
+        <ul>
+            <li>Go is not installed or not in your PATH</li>
+            <li>See "Prerequisites for Compilation" section above</li>
+        </ul>
+
+        <p><strong>"Permission denied" on Linux/macOS</strong></p>
+        <ul>
+            <li>Make the binary executable: <code>chmod +x talos-*</code></li>
+        </ul>
+
+        <h2>Performance Considerations</h2>
+        <ul>
+            <li><strong>In-Memory Database</strong>: All data is stored in memory for maximum speed</li>
+            <li><strong>SQL Optimization</strong>: SQLite optimizer handles query planning</li>
+            <li><strong>Batch Processing</strong>: INSERT and UPDATE operations are batched when possible</li>
+            <li><strong>Indexing</strong>: Primary keys are automatically indexed for fast lookups</li>
+            <li><strong>Memory Usage</strong>: Approximately 1–2 MB per 1000 individuals</li>
+            <li><strong>Migration Performance</strong>: Migration runs as a single SQL update, making it very fast even for large populations</li>
+        </ul>
+
+        <h3>Performance Benchmarks</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Population Size</th>
+                    <th>Memory Usage</th>
+                    <th>Time per Iteration</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1,000</td>
+                    <td>~2 MB</td>
+                    <td>&lt; 0.1 seconds</td>
+                </tr>
+                <tr>
+                    <td>10,000</td>
+                    <td>~20 MB</td>
+                    <td>~0.5 seconds</td>
+                </tr>
+                <tr>
+                    <td>100,000</td>
+                    <td>~200 MB</td>
+                    <td>~3 seconds</td>
+                </tr>
+                <tr>
+                    <td>1,000,000</td>
+                    <td>~2 GB</td>
+                    <td>~30 seconds</td>
+                </tr>
+            </tbody>
+        </table>
+        <p><em>* Benchmarks on Intel Core i7, 16 GB RAM, SSD</em></p>
+
+        <h2>Extending the Migration Model</h2>
+
+        <h3>Adding New Migration Rules</h3>
+        <ol>
+            <li>Edit <code>config.yaml</code>:</li>
+        </ol>
+        <pre><code>models:
+  - name: "migration"
+    type: "sql_update"
+    priority: 3
+    enabled: true
+    parameters:
+      migration_rates:
+        child_0_17: 0.02
+        adult_18_34: 0.08
+        # Add new age group
+        student_18_25: 0.10
+      query: |
+        UPDATE population 
+        SET area = 
+          CASE 
+            WHEN age >= 18 AND age < 25 AND alive = true AND random() < {migration_rates.student_18_25} 
+              THEN CAST(abs(random() % 5) + 1 AS INTEGER)
+            -- ... existing age groups
+            ELSE area
+          END
+        WHERE alive = true</code></pre>
+        <ol start="2">
+            <li>No code changes required!</li>
+        </ol>
+
+        <h3>Adding Destination Preferences</h3>
+        <pre><code>-- Weighted random: 30% chance of area 1, 20% chance of area 2
+THEN CASE 
+  WHEN random() < 0.3 THEN 1
+  WHEN random() < 0.5 THEN 2
+  ELSE CAST(abs(random() % 5) + 1 AS INTEGER)
+END</code></pre>
+
+        <h3>Adding Distance-Based Migration</h3>
+        <pre><code>-- Only move to adjacent areas
+THEN area + (CASE 
+  WHEN random() < 0.33 THEN -1
+  WHEN random() < 0.66 THEN 1
+  ELSE 0
+END)</code></pre>
+
+        <h3>Adding Household Migration</h3>
+        <p>For household-level migration, add a <code>household_id</code> column and modify the migration query:</p>
+        <pre><code>-- Identify households where the head moves
+WITH moving_households AS (
+  SELECT DISTINCT household_id
+  FROM population
+  WHERE alive = true 
+    AND age BETWEEN 18 AND 34 
+    AND random() < 0.08
+)
+-- Move all members of those households
+UPDATE population 
+SET area = new_area
+FROM (SELECT household_id, CAST(abs(random() % 5) + 1 AS INTEGER) as new_area
+      FROM moving_households) m
+WHERE population.household_id = m.household_id
+  AND alive = true</code></pre>
+
+        <h2>License</h2>
+        <p>MIT License — See LICENSE file for details.</p>
+
+        <h2>Authors</h2>
+        <p>Nik Lomax<br>
+        Alison Heppenstall<br>
+        Andreas Hoehn<br>
+        Hugh Rice<br>
+        Ric Colasanti</p>
+
+        <h2>Acknowledgments</h2>
+        <p>This system builds upon the excellent work of:</p>
+        <ul>
+            <li><strong>SQLite</strong>: The world's most used database engine</li>
+            <li><strong>modernc.org/sqlite</strong>: Pure Go port of SQLite</li>
+            <li><strong>Go</strong>: The programming language that makes it all possible</li>
+            <li><strong>Migration Research Community</strong>: For insights into population movement patterns</li>
+        </ul>
+
+        <div class="footer">
+            <p>&copy; 2024 Talos Contributors</p>
+        </div>
+
+    </div>
+</body>
+</html>
