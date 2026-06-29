@@ -1,8 +1,10 @@
+Here's the complete README.md with the tutorials section added right after Overview:
+
+```markdown
 <div align="left">
   <img src="img/Talos.jpeg" alt="Talos Logo" width="300" height="300">
   <p><em>Talos — Migration Microsimulation Engine</em></p>
-</div>    
-
+</div>
 
 # Talos
 ## Migration Microsimulation Engine
@@ -19,6 +21,14 @@ Talos is a **migration-focused microsimulation engine** that models population d
 - **Pure Go SQLite** for in-memory data processing (no external dependencies)
 
 The result is a single, self-contained executable that can be distributed and run on any system without installation requirements. **Talos's primary strength is its ability to model complex migration patterns** with age-specific probabilities, area tracking, and configurable destination selection.
+
+## 📚 Tutorials
+
+Get started with Talos through our step-by-step tutorials. Each tutorial builds on the previous one, taking you from beginner to advanced user.
+
+| Tutorial | Description | Level |
+|----------|-------------|-------|
+| [Tutorial 1: Building an Aging Model](tutorials/tutorial1_aging.md) | Learn the basics by creating a simple aging model. You'll create a population CSV, write your first configuration, run the simulation, and analyze the output. | ⭐ Beginner |
 
 ## Key Features
 
