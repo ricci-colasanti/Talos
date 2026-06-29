@@ -20,7 +20,7 @@ Talos is a **migration-focused microsimulation engine** that models population d
 
 The result is a single, self-contained executable that can be distributed and run on any system without installation requirements. **Talos's primary strength is its ability to model complex migration patterns** with age-specific probabilities, area tracking, and configurable destination selection.
 
-## 📚 Tutorials
+## Tutorials
 
 Get started with Talos through our step-by-step tutorials. Each tutorial builds on the previous one, taking you from beginner to advanced user.
 
