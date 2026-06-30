@@ -81,10 +81,17 @@ These rates are fully configurable in the YAML configuration file.
 
 ## Quick Start
 
+### No Installation Required!
+
+Talos is distributed as pre-built executables for multiple platforms. **You don't need to install Go or compile anything** to use Talos - just download the executable for your platform and run it.
+
+If you're a developer who wants to modify the source code or compile for a different platform, compilation instructions are provided in the [Compiling from Source](#compiling-from-source) section.
+
 ### Prerequisites
 
-- Go 1.21 or later (only required for compilation - pre-built binaries have no dependencies)
-- Git (optional, for cloning)
+- None! Just download the executable for your platform
+- A text editor (VS Code, Sublime, Notepad++, etc.) for editing configuration files
+- **Optional**: Go 1.21+ if you want to compile from source
 
 ### Important: Specify Your ID Column
 
@@ -99,7 +106,7 @@ This column must exist in your population CSV and contain unique values for each
 
 ### Download Pre-Built Binary (Easiest)
 
-Choose your platform and download the appropriate binary:
+Pre-built executables are included in the release package. Choose your platform:
 
 | Platform | Binary Name |
 |----------|-------------|
@@ -121,11 +128,8 @@ talos-windows-amd64.exe config.yaml
 ### Run with Sample Data
 
 ```bash
-# Download sample configuration and data
-wget https://raw.githubusercontent.com/your-repo/talos/main/config.yaml
-wget https://raw.githubusercontent.com/your-repo/talos/main/population.csv
-
-# Run the simulation
+# Make sure you have config.yaml and population.csv in the same directory
+# Then run Talos with your configuration
 ./talos-linux-amd64 config.yaml
 ```
 
@@ -296,12 +300,14 @@ The final population state is saved as CSV with all columns preserved, including
 
 ## Compiling from Source
 
+**Note:** This section is optional. Pre-built executables are included in the release package. You only need to compile from source if you want to modify the code or build for a platform not included.
+
 ### Prerequisites for Compilation
 
 - Go 1.21 or later
 - Git (optional)
 
-### Step 1: Install Go
+### Step 1: Install Go (if not already installed)
 
 **Ubuntu/Debian:**
 ```bash
@@ -465,7 +471,7 @@ Add the directory containing `talos-windows-amd64.exe` to your PATH, or rename t
 
 **"go: command not found"**
 - Go is not installed or not in your PATH
-- See "Prerequisites for Compilation" section above
+- See "Compiling from Source" section above
 
 **"Permission denied" on Linux/macOS**
 - Make the binary executable: `chmod +x talos-*`
@@ -573,6 +579,6 @@ MIT License - See LICENSE file for details.
 
 Nik Lomax  
 Alison Heppenstall  
-Andreas Hoehn  
 Hugh Rice  
+Andreas Hoehn  
 Ric Colasanti
