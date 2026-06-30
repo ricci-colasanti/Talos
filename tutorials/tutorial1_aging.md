@@ -246,6 +246,7 @@ Here's the basic structure of a Talos configuration file:
 simulation:                   # Level 1
   iterations: 5              # Level 2
   population_file: "file"    # Level 2
+  id_column: "person_id"     # Level 2 (REQUIRED)
 
 models:                       # Level 1
   - name: "model1"           # Level 2 (list item)
@@ -271,6 +272,7 @@ simulation:
   output_file: "population_aged.csv" # Output after aging
   random_seed: 42                   # For reproducibility
   verbose: true                     # Show detailed output
+  id_column: "person_id"            # REQUIRED: Primary key column
 
 models:
   - name: "age_increment"
@@ -310,6 +312,9 @@ Let's break down what this configuration does:
 - `output_file` - Where to save the final population
 - `random_seed` - Ensures results are reproducible
 - `verbose: true` - Shows detailed logging
+- `id_column: "person_id"` - **REQUIRED**: Specifies which column is the unique identifier
+
+**Why is `id_column` required?** Talos uses this column as the PRIMARY KEY in the database and to order the output CSV. This ensures consistent ordering of results across runs.
 
 **Models Section:**
 - We define one model called `age_increment`
@@ -379,6 +384,7 @@ You should see output similar to this:
 2024/01/15 10:00:00 Starting simulation
 2024/01/15 10:00:00 Iterations: 5
 2024/01/15 10:00:00 Population file: population.csv
+2024/01/15 10:00:00 ID column: person_id
 2024/01/15 10:00:00 Models loaded: 1
 2024/01/15 10:00:00 Statistics defined: 2
 2024/01/15 10:00:00 Loaded 10 individuals with 4 columns
@@ -457,6 +463,8 @@ Notice that everyone has aged exactly 5 years:
 - Person 8: 35 → 40
 - Person 9: 55 → 60
 - Person 10: 70 → 75
+
+Also notice that the output is ordered by `person_id` (the `id_column` we specified), making it easy to compare results across runs.
 
 ## Step 6: Adding More Statistics (Understanding SQL)
 
@@ -801,6 +809,7 @@ simulation:
   output_file: "population_aged.csv"
   random_seed: 42
   verbose: true
+  id_column: "person_id"            # REQUIRED: Primary key column
 
 models:
   - name: "age_increment"
@@ -944,6 +953,7 @@ You've successfully:
 - **CASE statements enable grouping**: Create age groups, sex distributions, etc.
 - **Aggregation functions summarize**: COUNT, AVG, MIN, MAX give overview statistics
 - **STDDEV() measures spread**: Tells you how diverse your population is
+- **`id_column` is required**: Talos needs to know which column is the unique identifier for ordering and PRIMARY KEY
 
 ### Common SQL Functions Reference
 
@@ -969,10 +979,20 @@ In the next tutorial, we'll add mortality to the aging model, creating a more re
 
 ## Troubleshooting
 
+**Error: "id_column is required in simulation section of config.yaml"**
+- Add `id_column: "your_id_column"` to the `simulation` section in config.yaml
+- Make sure the column name matches exactly with your CSV header
+
+**Error: "ID column 'person_id' not found in CSV header"**
+- Check that the column name in `id_column` matches your CSV header exactly
+- Available columns are listed in the error message
+- Example: If your CSV has `id` instead of `person_id`, use `id_column: "id"`
+
 **Error: "Failed to load population"**
 - Check that `population.csv` exists in the same directory
 - Verify the CSV has a header row
 - Ensure all rows have the same number of columns
+- Make sure `id_column` matches a column in the CSV
 
 **Error: "Failed to execute model query"**
 - Check your SQL syntax in the query

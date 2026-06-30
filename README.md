@@ -86,6 +86,17 @@ These rates are fully configurable in the YAML configuration file.
 - Go 1.21 or later (only required for compilation - pre-built binaries have no dependencies)
 - Git (optional, for cloning)
 
+### Important: Specify Your ID Column
+
+Before running Talos, make sure your `config.yaml` includes an `id_column`:
+
+```yaml
+simulation:
+  id_column: "person_id"  # Replace with your ID column name
+```
+
+This column must exist in your population CSV and contain unique values for each individual.
+
 ### Download Pre-Built Binary (Easiest)
 
 Choose your platform and download the appropriate binary:
@@ -131,7 +142,7 @@ simulation:
   output_file: "output.csv"         # Output CSV file
   random_seed: 42                   # Fixed random seed for reproducibility
   verbose: true                     # Detailed logging output
-  output_order: "person_id"         # Column(s) to order output by (optional)
+  id_column: "person_id"            # REQUIRED: Primary key column for ordering
 ```
 
 ### Model Definitions
@@ -230,13 +241,30 @@ statistics:
 The system accepts any CSV file with a header row. Column types are automatically detected:
 
 ### Required Columns
-- `person_id`: Unique identifier
+- `person_id`: Unique identifier (must match `id_column` in config)
 - `age`: Age in years
 - `area`: Current geographic area (integer or string)
 - `alive`: Boolean indicating if individual is alive
 
 ### Recommended Columns
 - `previous_area`: Previous geographic area (initialized to 0 or -1)
+
+### ID Column
+
+Talos requires you to specify an **ID column** in the configuration. This column:
+- Must contain unique values for each individual
+- Is used as the PRIMARY KEY in the database
+- Determines the order of rows in the output CSV
+
+**Why is this required?** Talos uses the ID column to ensure consistent ordering of output data, making it easier to compare results across different runs.
+
+**Example:**
+```yaml
+simulation:
+  id_column: "person_id"  # Must match a column in your CSV
+```
+
+If the ID column is not specified or doesn't exist in the CSV, Talos will exit with an error.
 
 ### Example CSV
 ```csv
@@ -264,7 +292,7 @@ The final population state is saved as CSV with all columns preserved, including
 - Migration history (previous_area)
 - Additional columns added by models
 
-The output can be ordered by any column using the `output_order` parameter in the simulation configuration.
+**Note:** The output CSV is always ordered by the ID column specified in the configuration.
 
 ## Compiling from Source
 
@@ -407,6 +435,15 @@ Add the directory containing `talos-windows-amd64.exe` to your PATH, or rename t
 
 ### Common Issues
 
+**"ERROR: id_column is required in simulation section of config.yaml"**
+- Add `id_column: "your_id_column"` to the `simulation` section in config.yaml
+- Make sure the column name matches exactly with your CSV header
+
+**"ID column 'person_id' not found in CSV header"**
+- Check that the column name in `id_column` matches your CSV header exactly
+- Available columns are listed in the error message
+- Example: If your CSV has `id` instead of `person_id`, use `id_column: "id"`
+
 **"No such function: random"**
 - Some SQLite builds may not include the random() function
 - Use `abs(random() % 1000000) / 1000000.0` instead
@@ -415,6 +452,7 @@ Add the directory containing `talos-windows-amd64.exe` to your PATH, or rename t
 - Check CSV file path and format
 - Ensure CSV has a header row
 - Verify all rows have the same number of columns
+- Make sure `id_column` matches a column in the CSV
 
 **"Failed to execute model query"**
 - Check SQL syntax in the model definition
@@ -538,4 +576,3 @@ Alison Heppenstall
 Andreas Hoehn  
 Hugh Rice  
 Ric Colasanti
-

@@ -5,9 +5,7 @@ simulation:
   output_file: "output.csv"
   random_seed: 42
   verbose: true
-  # OPTIONAL: Specify output ordering
-  # If not specified, Talos will try to infer an ID column
-  output_order: "person_id"  # Can also use: area, age, family_id, etc.
+  id_column: "person_id"     # REQUIRED
 
 # Statistics definitions - fully configurable, no hardcoded columns!
 statistics:
