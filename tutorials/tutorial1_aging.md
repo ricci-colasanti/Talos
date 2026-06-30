@@ -458,7 +458,6 @@ Notice that everyone has aged exactly 5 years:
 - Person 9: 55 → 60
 - Person 10: 70 → 75
 
-
 ## Step 6: Adding More Statistics (Understanding SQL)
 
 Now let's add more statistics to better understand our population. **This is where we'll learn the basics of SQL**, which is the language Talos uses for models and statistics.
@@ -496,7 +495,6 @@ And that's it! The examples in this tutorial cover everything you'll need for mo
 
 ### What is SQL?
 
-
 SQL (Structured Query Language) is a standard language for managing data in databases. Think of it as a way to ask questions about your data:
 - "How many people are there?" → `SELECT COUNT(*) FROM population`
 - "What's the average age?" → `SELECT AVG(age) FROM population`
@@ -509,7 +507,7 @@ Think of it like using a calculator:
 - You just need to know which buttons to press
 - The calculator does the heavy lifting
 
-Same with SQL in Talos - you just need to know the few patterns we show you!`
+Same with SQL in Talos - you just need to know the few patterns we show you!
 
 ### Basic SQL Concepts
 

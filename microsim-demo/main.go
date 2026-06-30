@@ -12,8 +12,8 @@ import (
 	"strings"
 	"time"
 
-	_ "modernc.org/sqlite"
 	"gopkg.in/yaml.v3"
+	_ "modernc.org/sqlite"
 )
 
 // ModelConfig represents a single model definition in YAML
@@ -47,13 +47,14 @@ type SimulationParameters struct {
 	OutputFile     string `yaml:"output_file"`
 	RandomSeed     int64  `yaml:"random_seed"`
 	Verbose        bool   `yaml:"verbose"`
+	OutputOrder    string `yaml:"output_order"` // NEW: ORDER BY clause for output
 }
 
 // ColumnInfo stores metadata about a column
 type ColumnInfo struct {
-	Name    string
-	Type    string // "int", "string", "bool"
-	IsKey   bool
+	Name  string
+	Type  string // "int", "string", "bool"
+	IsKey bool
 }
 
 func main() {
@@ -86,6 +87,9 @@ func main() {
 	log.Printf("Population file: %s", simConfig.Simulation.PopulationFile)
 	log.Printf("Models loaded: %d", len(simConfig.Models))
 	log.Printf("Statistics defined: %d", len(simConfig.Statistics))
+	if simConfig.Simulation.OutputOrder != "" {
+		log.Printf("Output order: %s", simConfig.Simulation.OutputOrder)
+	}
 
 	// 2. Load population data dynamically
 	db, columns, err := loadPopulationDynamic(simConfig.Simulation.PopulationFile)
@@ -120,8 +124,8 @@ func main() {
 		printStatistics(db, simConfig.Statistics, i+1)
 	}
 
-	// 5. Save final population dynamically
-	if err := savePopulationDynamic(db, columns, simConfig.Simulation.OutputFile); err != nil {
+	// 5. Save final population dynamically with configurable ordering
+	if err := savePopulationDynamic(db, columns, simConfig.Simulation.OutputFile, simConfig.Simulation.OutputOrder); err != nil {
 		log.Fatalf("Failed to save population: %v", err)
 	}
 
@@ -406,10 +410,26 @@ func printStatistics(db *sql.DB, statistics []StatisticConfig, iteration int) {
 }
 
 // savePopulationDynamic exports the final population to CSV dynamically
-func savePopulationDynamic(db *sql.DB, columns []ColumnInfo, outputFile string) error {
+// with configurable ORDER BY clause
+func savePopulationDynamic(db *sql.DB, columns []ColumnInfo, outputFile string, outputOrder string) error {
 	colNames := getColumnNames(columns)
 
-	query := fmt.Sprintf("SELECT %s FROM population ORDER BY person_id", strings.Join(colNames, ", "))
+	// Build ORDER BY clause
+	orderClause := ""
+	if outputOrder != "" {
+		// User specified ORDER BY in config
+		orderClause = fmt.Sprintf("ORDER BY %s", outputOrder)
+		log.Printf("Using output_order from config: %s", outputOrder)
+	} else {
+		// Default: try to infer ID column
+		idColumn := inferIDColumn(colNames)
+		orderClause = fmt.Sprintf("ORDER BY %s", idColumn)
+		log.Printf("No output_order specified, using inferred ID column: %s", idColumn)
+	}
+
+	query := fmt.Sprintf("SELECT %s FROM population %s",
+		strings.Join(colNames, ", "),
+		orderClause)
 
 	rows, err := db.Query(query)
 	if err != nil {
@@ -472,6 +492,32 @@ func savePopulationDynamic(db *sql.DB, columns []ColumnInfo, outputFile string) 
 	}
 
 	return nil
+}
+
+// inferIDColumn tries to find an ID column from common names
+func inferIDColumn(colNames []string) string {
+	// Common ID column patterns
+	idPatterns := []string{"person_id", "id", "individual_id", "pid", "row_id", "rowid"}
+
+	for _, col := range colNames {
+		lower := strings.ToLower(col)
+		for _, pattern := range idPatterns {
+			if lower == pattern {
+				return col
+			}
+		}
+	}
+
+	// Check for columns containing "id" (case insensitive)
+	for _, col := range colNames {
+		lower := strings.ToLower(col)
+		if strings.Contains(lower, "id") {
+			return col
+		}
+	}
+
+	// Fallback to first column
+	return colNames[0]
 }
 
 // getColumnNames returns a slice of column names

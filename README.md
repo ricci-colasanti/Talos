@@ -1,4 +1,3 @@
-
 <div align="left">
   <img src="img/Talos.png" alt="Talos Logo" width="300" height="300">
   <p><em>Talos — Migration Microsimulation Engine</em></p>
@@ -7,12 +6,11 @@
 # Talos
 ## Migration Microsimulation Engine
 
-A fully self-contained, dynamically configurable demographic microsimulation system written in Go. **Talos is specifically designed as a migration microsimulation model** that simulates population movement between geographic areas while also handling other demographic processes like aging and mortality.   
+A fully self-contained, dynamically configurable demographic microsimulation system written in Go. **Talos is specifically designed as a migration microsimulation model** that simulates population movement between geographic areas while also handling other demographic processes like aging and mortality.
 
 The design and architecture of Talos is described in the following paper:
 
-> **SQL as a Domain-Specific Language for Demographic Microsimulation**  
-
+> **SQL as a Domain-Specific Language for Demographic Microsimulation**
 
 This paper discusses how SQL's declarative nature makes it ideal for demographic modeling, the Lisp-SQL connection, and the practical implementation of migration microsimulation using pure Go SQLite.
 
@@ -133,6 +131,7 @@ simulation:
   output_file: "output.csv"         # Output CSV file
   random_seed: 42                   # Fixed random seed for reproducibility
   verbose: true                     # Detailed logging output
+  output_order: "person_id"         # Column(s) to order output by (optional)
 ```
 
 ### Model Definitions
@@ -264,6 +263,8 @@ The final population state is saved as CSV with all columns preserved, including
 - Original columns (person_id, age, sex, area, alive)
 - Migration history (previous_area)
 - Additional columns added by models
+
+The output can be ordered by any column using the `output_order` parameter in the simulation configuration.
 
 ## Compiling from Source
 
@@ -536,5 +537,5 @@ Nik Lomax
 Alison Heppenstall  
 Andreas Hoehn  
 Hugh Rice  
-Ric Colasanti  
+Ric Colasanti
 
