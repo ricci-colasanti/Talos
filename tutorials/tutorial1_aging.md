@@ -181,11 +181,11 @@ WHERE alive = true
 
 **Quick Summary:**
 
-| Without `|` | With `|` |
-|-------------|----------|
-| Single line only | Multiple lines allowed |
-| `query: "UPDATE population SET age = age + 1 WHERE alive = true"` | `query: |`<br>`  UPDATE population`<br>`  SET age = age + 1`<br>`  WHERE alive = true` |
-| Hard to read for complex queries | Easy to read and maintain |
+| Feature | Without \| | With \| |
+|---------|------------|---------|
+| Lines allowed | Single line only | Multiple lines allowed |
+| Example | `query: "UPDATE population SET age = age + 1 WHERE alive = true"` | `query: \|`<br>`  UPDATE population`<br>`  SET age = age + 1`<br>`  WHERE alive = true` |
+| Readability | Hard to read for complex queries | Easy to read and maintain |
 
 **Remember:**
 - Always use the pipe (`|`) for SQL queries that span multiple lines
