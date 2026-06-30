@@ -7,9 +7,14 @@
 # Talos
 ## Migration Microsimulation Engine
 
-A fully self-contained, dynamically configurable demographic microsimulation system written in Go. **Talos is specifically designed as a migration microsimulation model** that simulates population movement between geographic areas while also handling other demographic processes like aging and mortality.
+A fully self-contained, dynamically configurable demographic microsimulation system written in Go. **Talos is specifically designed as a migration microsimulation model** that simulates population movement between geographic areas while also handling other demographic processes like aging and mortality.   
 
-**Read the paper:** [SQL as a Domain-Specific Language for Demographic Microsimulation](SQL_as_a_Domain_Specific_Language_for_Demographic_Migration_Microsimulation.md.pdf)
+The design and architecture of Talos is described in the following paper:
+
+> **SQL as a Domain-Specific Language for Demographic Microsimulation**  
+> [Download PDF](SQL_as_a_Domain_Specific_Language_for_Demographic_Migration_Microsimulation.md.pdf.pdf)
+
+
 
 ## Overview
 
