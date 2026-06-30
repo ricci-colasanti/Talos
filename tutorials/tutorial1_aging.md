@@ -458,7 +458,6 @@ Notice that everyone has aged exactly 5 years:
 - Person 9: 55 → 60
 - Person 10: 70 → 75
 
-## Step 6: Adding More Statistics (Understanding SQL)
 
 ## Step 6: Adding More Statistics (Understanding SQL)
 
