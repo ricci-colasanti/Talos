@@ -12,9 +12,11 @@ A fully self-contained, dynamically configurable demographic microsimulation sys
 The design and architecture of Talos is described in the following paper:
 
 > **SQL as a Domain-Specific Language for Demographic Microsimulation**  
-> [Download PDF](SQL_as_a_Domain_Specific_Language_for_Demographic_Migration_Microsimulation.md.pdf.pdf)
 
 
+This paper discusses how SQL's declarative nature makes it ideal for demographic modeling, the Lisp-SQL connection, and the practical implementation of migration microsimulation using pure Go SQLite.
+
+**Read the paper:** [SQL as a Domain-Specific Language for Demographic Microsimulation](SQL_as_a_Domain_Specific_Language_for_Demographic_Migration_Microsimulation.md.pdf)
 
 ## Overview
 
