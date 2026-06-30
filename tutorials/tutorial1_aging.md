@@ -10,6 +10,20 @@ In this tutorial, you'll learn how to create a simple aging model with Talos. We
 - Basic understanding of CSV files
 - A text editor (VS Code, Sublime, Notepad++, etc.)
 
+## What You'll Learn
+
+By the end of this tutorial, you'll be able to:
+- Create a population CSV file
+- Write a YAML configuration file
+- Run a Talos simulation
+- Add custom statistics using simple SQL queries
+
+**Important Note:** You don't need to understand SQL databases to use Talos! We're only using a small subset of SQL for **data retrieval** (asking questions about your data) and **data manipulation** (making changes to your data). Think of it as a way to:
+- **Ask**: "How many people are under 18?" → `COUNT(CASE WHEN age < 18 THEN 1 END)`
+- **Change**: "Make everyone one year older" → `UPDATE population SET age = age + 1`
+
+No database administration, no complex queries, no database design - just simple statements that work like plain English!
+
 ## Step 1: Create a Population CSV
 
 First, let's create a small population to work with. Create a file called `population.csv`:
@@ -446,27 +460,72 @@ Notice that everyone has aged exactly 5 years:
 
 ## Step 6: Adding More Statistics (Understanding SQL)
 
+## Step 6: Adding More Statistics (Understanding SQL)
+
 Now let's add more statistics to better understand our population. **This is where we'll learn the basics of SQL**, which is the language Talos uses for models and statistics.
 
+### Don't Worry - You Don't Need to Be a Database Expert!
+
+SQL (Structured Query Language) might sound intimidating, but **you only need to learn a few simple patterns** to use Talos effectively. Think of it like learning a few phrases in a new language - you don't need to be fluent!
+
+**The SQL we use in Talos is just for two things:**
+
+1. **Asking questions** (retrieving data):
+   - "How many people are there?" → `SELECT COUNT(*) FROM population`
+   - "What's the average age?" → `SELECT AVG(age) FROM population`
+   - "How many children are there?" → `SELECT COUNT(*) FROM population WHERE age < 18`
+
+2. **Making changes** (manipulating data):
+   - "Make everyone one year older" → `UPDATE population SET age = age + 1`
+   - "Only update alive people" → `UPDATE population SET age = age + 1 WHERE alive = true`
+
+**What you DON'T need to know:**
+- ❌ How to create or manage databases
+- ❌ How to design database schemas
+- ❌ How to optimize queries for performance
+- ❌ How to use joins or complex subqueries
+- ❌ How to administer a database system
+
+**What you DO need to know:**
+- ✅ How to ask questions about your data (SELECT)
+- ✅ How to make changes to your data (UPDATE)
+- ✅ How to filter data (WHERE)
+- ✅ How to count and summarize (COUNT, AVG, MIN, MAX)
+- ✅ How to group data conditionally (CASE WHEN...THEN)
+
+And that's it! The examples in this tutorial cover everything you'll need for most demographic simulations.
+
 ### What is SQL?
+
 
 SQL (Structured Query Language) is a standard language for managing data in databases. Think of it as a way to ask questions about your data:
 - "How many people are there?" → `SELECT COUNT(*) FROM population`
 - "What's the average age?" → `SELECT AVG(age) FROM population`
 - "How many men vs women?" → `SELECT COUNT(*) FROM population WHERE sex = 'F'`
 
+**In Talos, SQL is just a tool - not the focus.** You're using it to tell the simulation engine what to do. The engine handles all the complex database stuff behind the scenes. You just write simple statements that read like English.
+
+Think of it like using a calculator:
+- You don't need to understand how the calculator works internally
+- You just need to know which buttons to press
+- The calculator does the heavy lifting
+
+Same with SQL in Talos - you just need to know the few patterns we show you!`
+
 ### Basic SQL Concepts
 
-| Concept | What it does | Example |
-|---------|--------------|---------|
-| `SELECT` | Choose data to look at | `SELECT age` |
-| `FROM` | Which table to use | `FROM population` |
-| `WHERE` | Filter rows | `WHERE alive = true` |
-| `COUNT(*)` | Count all rows | `COUNT(*)` |
-| `AVG()` | Calculate average | `AVG(age)` |
-| `MIN()` | Find minimum | `MIN(age)` |
-| `MAX()` | Find maximum | `MAX(age)` |
-| `CASE WHEN...THEN...END` | Conditional logic | `CASE WHEN age < 18 THEN 'child' END` |
+Remember: **These are the ONLY concepts you need to know!** Everything else is handled by Talos.
+
+| Concept | What it does | Example | Plain English |
+|---------|--------------|---------|---------------|
+| `SELECT` | Choose data to look at | `SELECT age` | "Show me the ages" |
+| `FROM` | Which table to use | `FROM population` | "From the population data" |
+| `WHERE` | Filter rows | `WHERE alive = true` | "Only where alive is true" |
+| `COUNT(*)` | Count all rows | `COUNT(*)` | "Count everyone" |
+| `AVG()` | Calculate average | `AVG(age)` | "Average age" |
+| `MIN()` | Find minimum | `MIN(age)` | "Youngest person" |
+| `MAX()` | Find maximum | `MAX(age)` | "Oldest person" |
+| `CASE WHEN...THEN...END` | Conditional logic | `CASE WHEN age < 18 THEN 1 END` | "If age is under 18, count it" |
 
 ### Adding New Statistics
 
@@ -878,6 +937,7 @@ You've successfully:
 
 ### Key Takeaways
 
+- **You don't need to be a database expert**: Talos uses a small, friendly subset of SQL
 - **YAML is whitespace-sensitive**: Indentation matters and always use spaces, never tabs
 - **The pipe (`|`) is for multi-line strings**: Essential for writing readable SQL queries
 - **Column names must match exactly**: What you put in your CSV must match what you write in SQL queries
